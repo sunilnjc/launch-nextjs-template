@@ -11,7 +11,7 @@ export async function loadLaunchConfig(signal: AbortSignal): Promise<LaunchConfi
   const supabaseUrl = typeof raw.supabaseUrl === "string" ? raw.supabaseUrl : process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const supabaseAnonKey = typeof raw.supabaseAnonKey === "string" ? raw.supabaseAnonKey : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
   const authRedirectPath = typeof raw.authRedirectPath === "string" ? raw.authRedirectPath : "/auth/callback";
-  if (!authRedirectPath.startsWith("/") || authRedirectPath.startsWith("//") || authRedirectPath.includes(String.fromCharCode(92)) || /[?#]/.test(authRedirectPath)) throw new Error("Auth redirect must be a path on this app");
+  if (!["/auth/callback", "/auth/callback/"].includes(authRedirectPath)) throw new Error("Auth redirect must use the included /auth/callback route");
   if (supabaseUrl || supabaseAnonKey) {
     const url = new URL(supabaseUrl);
     const loopback = (host: string) => host === "localhost" || host === "127.0.0.1";

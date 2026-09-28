@@ -1,0 +1,13 @@
+/*
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+
+/auth/callback
+  Cache-Control: no-store
+
+/auth/callback/
+  Cache-Control: no-store
+
+/launch-config.json
+  Cache-Control: no-store
