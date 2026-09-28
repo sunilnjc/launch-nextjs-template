@@ -14,9 +14,11 @@ export async function loadLaunchConfig(signal: AbortSignal): Promise<LaunchConfi
   if (!authRedirectPath.startsWith("/") || authRedirectPath.startsWith("//") || authRedirectPath.includes(String.fromCharCode(92)) || /[?#]/.test(authRedirectPath)) throw new Error("Auth redirect must be a path on this app");
   if (supabaseUrl || supabaseAnonKey) {
     const url = new URL(supabaseUrl);
-    if (url.protocol !== "https:" || url.username || url.password || url.pathname !== "/" || url.search || url.hash) throw new Error("Invalid Supabase project URL");
+    const loopback = (host: string) => host === "localhost" || host === "127.0.0.1";
+    const localDevelopment = typeof window !== "undefined" && loopback(window.location.hostname) && loopback(url.hostname);
+    if ((url.protocol !== "https:" && !(url.protocol === "http:" && localDevelopment)) || url.username || url.password || url.pathname !== "/" || url.search || url.hash) throw new Error("Invalid Supabase project URL");
     if (supabaseAnonKey.startsWith("sb_secret_")) throw new Error("Private Supabase keys must never be public");
-    if (!supabaseAnonKey.startsWith("sb_publishable_")) {
+    if (!/^sb_publishable_[A-Za-z0-9_-]{16,}$/.test(supabaseAnonKey)) {
       try {
         const encoded = supabaseAnonKey.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
         const payload = JSON.parse(atob(encoded)) as { role?: string };

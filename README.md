@@ -4,7 +4,7 @@ Next.js, TypeScript, Tailwind, a shadcn-compatible button and Supabase magic lin
 
 ## Run
 
-Run `npm install`, copy `.env.example` to `.env.local`, add your NEW Supabase project URL and publishable anon key, then `npm run dev`. Open http://localhost:4319. Never place a service-role key in a NEXT_PUBLIC variable.
+Run `npm install`, copy `.env.example` to `.env.local`, add your NEW Supabase project URL and publishable anon key, then `npm run dev`. Open http://localhost:4319. Never place a service-role key in a NEXT_PUBLIC variable. Local Supabase may use HTTP only when both the app and Supabase run on localhost or 127.0.0.1; production requires HTTPS.
 
 Apply `supabase/schema.sql` in your own Supabase project. In Authentication URL Configuration, set Site URL to the live URL and add the live /auth/callback URL and http://localhost:4319/auth/callback as redirect URLs. The magic link returns to the generated callback page and the Supabase browser client establishes the session before returning to the app.
 

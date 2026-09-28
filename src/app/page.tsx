@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
+import { type Session, type SupabaseClient } from "@supabase/supabase-js";
+import { getStarterClient, readAuthCallback, finishAuthCallback } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 type Note = { id: string; title: string };
 import { loadLaunchConfig } from "@/lib/launch-config";
@@ -27,14 +28,15 @@ export default function Home() {
         document.title = config.appName || "Your app";
         setRedirectPath(config.authRedirectPath);
         if (!config.supabaseUrl || !config.supabaseAnonKey) { setReady(true); return; }
-        const sb = createClient(config.supabaseUrl, config.supabaseAnonKey);
+        const callback = readAuthCallback();
+        const sb = getStarterClient(config);
         const { data: listener } = sb.auth.onAuthStateChange((_event, next) => { if (active) { setSession(next); if (!next) setNotes([]); } });
         unsubscribe = () => listener.subscription.unsubscribe();
         const { data, error } = await sb.auth.getSession();
         if (!active) return;
         setClient(sb); setSession(data.session);
-        if (data.session && window.location.pathname.replace(/\/$/, "") === "/auth/callback") window.history.replaceState(null, "", "/");
-        if (error) setNotice(error.message);
+        const authNotice = finishAuthCallback(callback, Boolean(data.session), Boolean(error));
+        if (authNotice) setNotice(authNotice);
       } catch { if (active) setNotice("Could not load the app configuration or sign-in session. Refresh to retry."); }
       finally { if (active) setReady(true); }
     }
