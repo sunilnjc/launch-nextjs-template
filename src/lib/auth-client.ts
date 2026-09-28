@@ -4,7 +4,7 @@ let browserClient: { url: string; key: string; client: SupabaseClient } | undefi
 /** Share one client across remounts: Supabase handles the callback URL exactly once per instance. */
 export function getStarterClient(config: LaunchConfig): SupabaseClient {
   if (!browserClient || browserClient.url !== config.supabaseUrl || browserClient.key !== config.supabaseAnonKey) {
-    browserClient = { url: config.supabaseUrl, key: config.supabaseAnonKey, client: createClient(config.supabaseUrl, config.supabaseAnonKey) };
+    browserClient = { url: config.supabaseUrl, key: config.supabaseAnonKey, client: createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { flowType: "pkce", detectSessionInUrl: true } }) };
   }
   return browserClient.client;
 }
