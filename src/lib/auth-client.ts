@@ -12,7 +12,17 @@ export type AuthCallbackState = { isCallback: boolean; failed: boolean };
 export function readAuthCallback(): AuthCallbackState {
   const url = new URL(window.location.href);
   const hash = new URLSearchParams(url.hash.slice(1));
-  return { isCallback: url.pathname === "/auth/callback" || url.pathname === "/auth/callback/", failed: hash.has("error") || hash.has("error_code") || url.searchParams.has("error") || url.searchParams.has("error_code") };
+  return { isCallback: url.pathname === "/auth/callback" || url.pathname === "/auth/callback/", failed: hash.has("error") || hash.has("error_code") || hash.has("error_description") || url.searchParams.has("error") || url.searchParams.has("error_code") || url.searchParams.has("error_description") };
+}
+export async function initializeStarterSession(client: SupabaseClient, callback: AuthCallbackState) {
+  try {
+    const initialized = await client.auth.initialize();
+    if (initialized.error || callback.failed) return { session: null, notice: finishAuthCallback(callback, false, true) };
+    const { data, error } = await client.auth.getSession();
+    return { session: error ? null : data.session, notice: finishAuthCallback(callback, Boolean(data.session), Boolean(error)) };
+  } catch {
+    return { session: null, notice: finishAuthCallback(callback, false, true) };
+  }
 }
 export function finishAuthCallback(state: AuthCallbackState, hasSession: boolean, hasError: boolean): string {
   if (state.isCallback) {
