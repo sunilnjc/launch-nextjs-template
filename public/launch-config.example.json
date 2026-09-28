@@ -1,0 +1,6 @@
+{
+  "appName": "Your app",
+  "supabaseUrl": "https://YOUR-NEW-PROJECT.supabase.co",
+  "supabaseAnonKey": "YOUR-PUBLISHABLE-KEY",
+  "authRedirectPath": "/auth/callback"
+}
